@@ -21,15 +21,22 @@ void main() {
     test('can upload a file returning the filename', () async {
       final fp = File('/home/bett/Downloads/Douglas-CV.pdf');
       final result = await storageService.uploadFile(fp, 'DouglasCV.pdf');
+      print(result);
       expect(result, isNotNull);
     });
 
     test('can download a file given a filename', () async {
-      final fp = File('/home/bett/Downloads/Douglas-CV.pdf');
-      final result = await storageService.uploadFile(fp, 'DouglasCV.pdf');
+      final fp = File(
+        '/home/bett/Documents/The ONE Thing by Gary Keller (z-lib.org).epub',
+      );
+      final result = await storageService.uploadFile(
+        fp,
+        'The ONE Thing by Gary Keller (z-lib.org).epub',
+      );
+      print(result);
       expect(result, isNotNull);
       final file = await storageService.getFile(result);
       expect(file, isNotNull);
-    });
+    }, timeout: Timeout.none);
   });
 }

@@ -15,9 +15,11 @@ class FirebaseStorageService {
 
   Future<String> uploadFile(File file, String fileName) async {
     // https://console.cloud.google.com/apis/dashboard storage needs to be enabled
-    final filename = '${Uuid().v4()}-$fileName';
-    await file.openRead().pipe(bucket.write(filename));
-    return filename;
+
+    fileName = '${Uuid().v4()}-$fileName'.replaceAll(' ', '_');
+    final response = await file.openRead().pipe(bucket.write(fileName));
+    print(response);
+    return fileName;
   }
 
   Future<File> getFile(String fileName) async {
@@ -39,3 +41,5 @@ Future<Storage> initializeCloudStorage() async {
   /// refer to the project id below
   return Storage(client, 'for-the-community');
 }
+
+// "b/innostrategies_net_bucket/o/0dfd7365-f7ca-49b6-a36c-61b2fcd209db-The_ONE_Thing_by_Gary_Keller_%28z-lib.org%29.epub"
