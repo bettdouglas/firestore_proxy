@@ -8,15 +8,20 @@ environment:
 
 dependencies:
   args: ^2.0.0
+  # creating the server
   shelf: ^1.1.0
+  # handling file uploads
   shelf_multipart: ^1.0.0
+  # sharing static files
   shelf_plus: ^1.4.0
-  dio: ^4.0.6
+  # dio: ^4.0.6
+  
   uuid: ^3.0.6
   mime_type: ^1.0.0
   gcloud: ^0.8.5
   googleapis_auth: ^1.3.1
   path: ^1.8.2
+  shelf_cors_headers: ^0.1.3
 
 dev_dependencies:
   http: ^0.13.0

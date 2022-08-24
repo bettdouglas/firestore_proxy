@@ -23,6 +23,7 @@ class FirebaseStorageService {
   }
 
   Future<File> getFile(String fileName) async {
+    await Directory('images/downloaded/').create();
     final file = await File('images/downloaded/$fileName').create();
     await bucket.read(fileName).pipe(file.openWrite());
     return file;

@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:firestore_proxy/firebase_storage_service.dart';
+import 'package:shelf/shelf_io.dart';
+import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 import 'package:shelf_multipart/multipart.dart';
 import 'package:shelf_multipart/form_data.dart';
 import 'package:shelf_plus/shelf_plus.dart';
@@ -32,7 +34,9 @@ Future<Response> _fileUploadHandler(Request request) async {
   final filePart = data['filename']!;
   final bytes = await filePart.readBytes();
   final uid = Uuid().v4();
+  await Directory('images').create();
   final file = await File('images/$uid-$path').writeAsBytes(bytes);
+  // uploads to cloud storage
   final url = await storageService.uploadFile(file, path);
   return Response(HttpStatus.ok, body: url);
 }
@@ -40,6 +44,8 @@ Future<Response> _fileUploadHandler(Request request) async {
 void main(List<String> args) async {
   final storage = await initializeCloudStorage();
   storageService = FirebaseStorageService(storage: storage);
+
+  final listChecker = originOneOf(['https://for-the-community.web.app']);
 
   final router = Router().plus
     ..get('/', _rootHandler)
@@ -54,14 +60,19 @@ void main(List<String> args) async {
   final ip = InternetAddress.anyIPv4;
   // For running in containers, we respect the PORT environment variable.
   final port = int.parse(Platform.environment['PORT'] ?? '8080');
-
+  print(port);
+  print(ip);
   // Configure a pipeline that logs requests.
-  final handler = Pipeline().addMiddleware(logRequests()).addHandler(router);
-  await shelfRun(
-    () => handler,
-    defaultBindAddress: ip,
-    defaultBindPort: port,
-  );
+  final handler = Pipeline()
+      .addMiddleware(logRequests())
+      .addMiddleware(corsHeaders(originChecker: listChecker))
+      .addHandler(router);
+  // await shelfRun(
+  //   () => handler,
+  //   defaultBindAddress: ip,
+  //   defaultBindPort: port,
+  // );
+  await serve(handler, ip, port);
 
   print('Server listening on port $port');
 }

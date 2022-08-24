@@ -15,7 +15,11 @@ RUN dart compile exe bin/server.dart -o bin/server
 FROM scratch
 COPY --from=build /runtime/ /
 COPY --from=build /app/bin/server /app/bin/
+COPY for-the-community-firebase-adminsdk-dtush-758d6ad2ba.json for-the-community-firebase-adminsdk-dtush-758d6ad2ba.json
 
 # Start server.
 EXPOSE 8080
 CMD ["/app/bin/server"]
+
+# 
+# gcloud run deploy --image gcr.io/$PROJECT_ID/hospitals_dart_grpc --platform managed
