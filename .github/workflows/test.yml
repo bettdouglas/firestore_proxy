@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: dart-lang/setup-dart
+      - uses: dart-lang/setup-dart@v1.3
 
       - name: Convert Firebase Secret to FilePath
         id: create_firebase_admin_sdk_json
