@@ -17,8 +17,7 @@ class FirebaseStorageService {
     // https://console.cloud.google.com/apis/dashboard storage needs to be enabled
 
     fileName = '${Uuid().v4()}-$fileName'.replaceAll(' ', '_');
-    final response = await file.openRead().pipe(bucket.write(fileName));
-    print(response);
+    await file.openRead().pipe(bucket.write(fileName));
     return fileName;
   }
 
@@ -28,13 +27,15 @@ class FirebaseStorageService {
     await bucket.read(fileName).pipe(file.openWrite());
     return file;
   }
+
+  Future<void> deleteFile(String fileName) async {
+    return bucket.delete(fileName);
+  }
 }
 
-Future<Storage> initializeCloudStorage() async {
+Future<Storage> initializeCloudStorage(String path) async {
   /// download service account from console.firebase.google.com
-  var jsonCredentials = File(
-    'for-the-community-firebase-adminsdk-dtush-758d6ad2ba.json',
-  ).readAsStringSync();
+  var jsonCredentials = File(path).readAsStringSync();
   var creds = auth.ServiceAccountCredentials.fromJson(jsonCredentials);
   var scopes = [...Storage.SCOPES];
   var client = await auth.clientViaServiceAccount(creds, scopes);

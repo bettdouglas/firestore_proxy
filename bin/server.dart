@@ -42,7 +42,11 @@ Future<Response> _fileUploadHandler(Request request) async {
 }
 
 void main(List<String> args) async {
-  final storage = await initializeCloudStorage();
+  final port = int.parse(Platform.environment['PORT'] ?? '8080');
+  final isDebug = bool.fromEnvironment('IS_DEBUG');
+  final serviceAccountFp = Platform.environment['ADMIN_SDK_FILE_PATH']!;
+
+  final storage = await initializeCloudStorage(serviceAccountFp);
   storageService = FirebaseStorageService(storage: storage);
 
   final listChecker = originOneOf(['https://for-the-community.web.app']);
@@ -54,28 +58,30 @@ void main(List<String> args) async {
     ..get('/files/<url>', (Request r, String url) async {
       final result = await storageService.getFile(url);
       return result;
+    })
+    ..delete('/files/<url>', (Request r, String url) async {
+      await storageService.deleteFile(url);
+      return Response.ok('File successfully deleted');
     });
 
   // Use any available host or container IP (usually `0.0.0.0`).
   final ip = InternetAddress.anyIPv4;
   // For running in containers, we respect the PORT environment variable.
-  final port = int.parse(Platform.environment['PORT'] ?? '8080');
-  print(port);
-  print(ip);
+
   // Configure a pipeline that logs requests.
   final handler = Pipeline()
       .addMiddleware(logRequests())
       .addMiddleware(corsHeaders(originChecker: listChecker))
       .addHandler(router);
+
+  // if (isDebug) {
   // await shelfRun(
   //   () => handler,
   //   defaultBindAddress: ip,
   //   defaultBindPort: port,
   // );
+  // } else {
   await serve(handler, ip, port);
-
+  // }
   print('Server listening on port $port');
 }
-
-
-// https://firebasestorage.googleapis.com/v0/b/for-the-community.appspot.com/o/images%2F58f24163-96c7-4708-99bc-3fa75b32d9672022-01-29%2010%3A17%3A54.493324.jpg?alt=media&token=e9bf9db5-1b0a-4c65-bd80-49fd9cf405df,https://firebasestorage.googleapis.com/v0/b/for-the-community.appspot.com/o/images%2Fbc911d9f-8e7b-49b3-9d81-5bf62eba46a02022-01-29%2010%3A17%3A57.579056.jpg?alt=media&token=8036b92f-5ec2-4639-aa64-a631ed161d31

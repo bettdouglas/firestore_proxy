@@ -1,5 +1,8 @@
 A server app built using [Shelf](https://pub.dev/packages/shelf),
 configured to enable running with [Docker](https://www.docker.com/).
+This project serves as an example of how to use Google Cloud Storage. It's meant to expose a file upload endpoint and a file download endpoint. 
+
+The 
 
 This sample code handles HTTP GET requests to `/` and `/echo/<message>`
 
@@ -47,3 +50,9 @@ You should see the logging printed in the first terminal:
 2021-05-06T15:47:04.620417  0:00:00.000158 GET     [200] /
 2021-05-06T15:47:08.392928  0:00:00.001216 GET     [200] /echo/I_love_Dart
 ```
+# Cloud Run
+### Building the docker image
+```gcloud builds submit --tag gcr.io/for-the-community/unitech-file-server```
+
+### Deploying to cloud run
+```gcloud run deploy --image gcr.io/for-the-community/unitech-file-server --min-instances 1 --ingress all --allow-unauthenticated```

@@ -1,0 +1,30 @@
+name: "Run Server Tests"
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: dart-lang/setup-dart
+
+      - name: Convert Firebase Secret to FilePath
+        id: create_firebase_admin_sdk_json
+        uses: ttd2089/secret-file-action@1.0.0
+        env:
+          secret: ${{ secrets.ADMIN_SDK_STR }}
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Analyze project source
+        run: dart analyze
+
+      - name: Run tests
+        run: dart test
+        env:
+          ADMIN_SDK_FILE_PATH: ${{ steps.create_firebase_admin_sdk_json.outputs.file }}
+          IS_DEBUG: false
