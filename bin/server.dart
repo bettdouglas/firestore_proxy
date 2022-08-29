@@ -43,8 +43,11 @@ Future<Response> _fileUploadHandler(Request request) async {
 
 void main(List<String> args) async {
   final port = int.parse(Platform.environment['PORT'] ?? '8080');
-  final isDebug = bool.fromEnvironment('IS_DEBUG');
-  final serviceAccountFp = Platform.environment['ADMIN_SDK_FILE_PATH']!;
+  final serviceAccountFp = Platform.environment['ADMIN_SDK_FILE_PATH'];
+
+  if (serviceAccountFp == null) {
+    throw Exception('Missing ADMIN_SDK_FILE_PATH environment variable');
+  }
 
   final storage = await initializeCloudStorage(serviceAccountFp);
   storageService = FirebaseStorageService(storage: storage);
