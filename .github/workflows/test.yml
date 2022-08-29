@@ -11,11 +11,16 @@ jobs:
 
       - uses: dart-lang/setup-dart@v1.3
 
-      - name: Convert Firebase Secret to FilePath
-        id: create_firebase_admin_sdk_json
-        uses: ttd2089/secret-file-action@1.0.0
-        env:
-          secret: ${{ secrets.ADMIN_SDK_STR }}
+      - name: Convert Firebase Secret to file
+      - uses: devops-actions/json-to-file@v1.0.0
+        with:
+          json: ${{ secrets.ADMIN_SDK_STR }}
+          filename: 'firebase_config.json'
+
+      #   id: create_firebase_admin_sdk_json
+      #   uses: ttd2089/secret-file-action@1.0.0
+      #   env:
+      #     secret: ${{ secrets.ADMIN_SDK_STR }}
 
       - name: Install dependencies
         run: dart pub get
@@ -26,5 +31,6 @@ jobs:
       - name: Run tests
         run: dart test
         env:
-          ADMIN_SDK_FILE_PATH: ${{ steps.create_firebase_admin_sdk_json.outputs.file }}
+          # ADMIN_SDK_FILE_PATH: ${{ steps.create_firebase_admin_sdk_json.outputs.file }}
+          ADMIN_SDK_FILE_PATH: 'firebase_config.json'
           IS_DEBUG: false

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:http/http.dart';
+// ignore: depend_on_referenced_packages
 import 'package:http_parser/http_parser.dart' show MediaType;
 import 'package:test/test.dart';
 
