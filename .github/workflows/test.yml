@@ -17,11 +17,6 @@ jobs:
           json: ${{ secrets.ADMIN_SDK_STR }}
           filename: 'firebase_config.json'
 
-      #   id: create_firebase_admin_sdk_json
-      #   uses: ttd2089/secret-file-action@1.0.0
-      #   env:
-      #     secret: ${{ secrets.ADMIN_SDK_STR }}
-
       - name: Install dependencies
         run: dart pub get
 
