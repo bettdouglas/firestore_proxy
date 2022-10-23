@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart';
@@ -5,10 +6,14 @@ import 'package:http/http.dart';
 import 'package:http_parser/http_parser.dart' show MediaType;
 import 'package:test/test.dart';
 
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
+import 'package:path/path.dart' as p;
+import 'package:http/http.dart' as http;
+
 void main() {
   final port = '8080';
   final host = 'http://localhost:$port';
-  // final host = 'https://unitech-file-server-gskgoc2hxq-ez.a.run.app';
   late Process p;
 
   setUpAll(() async {
@@ -60,6 +65,48 @@ void main() {
       final url = await response.stream.bytesToString();
       expect(url, isNotNull);
     }, timeout: Timeout.none);
+
+    test('Can Upload file via http', () async {
+      // final filePath = kIsWeb ? null : file.path;
+      // final mimeType = filePath != null ? lookupMimeType(filePath) : null;
+      // final contentType = mimeType != null ? MediaType.parse(mimeType) : null;
+      final fp = File('README.md');
+      final bytes = await fp.readAsBytes();
+      final url = '$host/files/file_upload';
+      final uri = Uri.parse(url);
+      final request = http.MultipartRequest('POST', uri);
+      final multipartFile = http.MultipartFile.fromBytes(
+        'filename',
+        bytes,
+        filename: 'filename',
+        contentType: MediaType('application', 'pdf'),
+      );
+      request.files.add(multipartFile);
+
+      final httpClient = http.Client();
+      final response = await httpClient.send(request);
+
+      if (response.statusCode != 200) {
+        throw Exception('HTTP ${response.statusCode}');
+      }
+
+      final body = await response.stream.transform(utf8.decoder).join();
+      return body;
+      // final uri = Uri.parse('$host/files/file_upload');
+      // var request = http.MultipartRequest('POST', uri)
+      //   ..fields['user'] = 'nweiz@google.com'
+      //   ..fields['file_name'] = ''
+      //   ..files.add(
+      //      http.MultipartFile.fromBytes(
+      //       'filename',
+      //       file.bytes!,
+      //       contentType: MediaType('application', 'pdf'),
+      //     ),
+      //   );
+      // var response = await request.send();
+      // final url = await response.stream.bytesToString();
+      // return url;
+    });
   });
   test('can download file', () async {
     final fp = File('README.md');

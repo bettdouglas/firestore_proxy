@@ -44,13 +44,27 @@ Future<Response> _fileUploadHandler(Request request) async {
 void main(List<String> args) async {
   final port = int.parse(Platform.environment['PORT'] ?? '8080');
   final serviceAccountFp = Platform.environment['ADMIN_SDK_FILE_PATH'];
+  final bucketName = Platform.environment['BUCKET_NAME'];
+  final project = Platform.environment['PROJECT_ID'];
 
   if (serviceAccountFp == null) {
     throw Exception('Missing ADMIN_SDK_FILE_PATH environment variable');
   }
 
-  final storage = await initializeCloudStorage(serviceAccountFp);
-  storageService = FirebaseStorageService(storage: storage);
+  if (bucketName == null) {
+    throw Exception('Missing BUCKET_NAME environment variable');
+  }
+
+  if (project == null) {
+    throw Exception('Missing PROJECT_ID environment variable');
+  }
+
+  final bucket = await initializeCloudStorageBucket(
+    jsonCredentialsPath: serviceAccountFp,
+    bucketName: bucketName,
+    project: project,
+  );
+  storageService = FirebaseStorageService(bucket: bucket);
 
   final listChecker = originOneOf(['https://for-the-community.web.app']);
 

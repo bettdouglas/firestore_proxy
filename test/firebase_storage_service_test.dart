@@ -6,20 +6,25 @@ import 'package:test/test.dart';
 
 void main() {
   group('FirebaseStorageService', () {
-    late Storage storage;
+    late Bucket bucket;
     late FirebaseStorageService storageService;
 
     setUpAll(() async {
-      final path = Platform.environment['ADMIN_SDK_FILE_PATH'];
-      if (path == null) {
-        throw Exception('Missing ADMIN_SDK_FILE_PATH environment variable');
-      }
-      storage = await initializeCloudStorage(path);
-      storageService = FirebaseStorageService(storage: storage);
+      // final path = Platform.environment['ADMIN_SDK_FILE_PATH'];
+      // if (path == null) {
+      //   throw Exception('Missing ADMIN_SDK_FILE_PATH environment variable');
+      // }
+      final path = "for-the-community-firebase-adminsdk-dtush-758d6ad2ba.json";
+      bucket = await initializeCloudStorageBucket(
+        jsonCredentialsPath: path,
+        bucketName: 'BUCKET_NAME',
+        project: 'PROJECT',
+      );
+      storageService = FirebaseStorageService(bucket: bucket);
     });
 
     test('can initialize storage service', () {
-      expect(storage, isNotNull);
+      expect(bucket, isNotNull);
     });
 
     test('can upload a file returning the filename', () async {
